@@ -24,6 +24,9 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
+if( ! class_exists( 'Smashing_Updater' ) ){
+	include_once( plugin_dir_path( __FILE__ ) . 'updater.php' );
+}
 
 require_once( 'includes/helper.php' );
 require_once( 'includes/andar-field-list.php' );
@@ -31,6 +34,11 @@ require_once( 'includes/rest-endpoint.php' );
 
 define( 'GF_SIMPLE_ADDON_VERSION', '2.1' );
 define( 'GF_SIMPLE_FIELD_ADDON_VERSION', '1.0' );
+
+$updater = new Smashing_Updater( __FILE__ );
+$updater->set_username( 'mightily' );
+$updater->set_repository( 'gfta-uwcc' );
+$updater->initialize();
 
 add_action( 'gform_loaded', array( 'GF_to_Andar_Bootstrap', 'load' ), 5 );
 add_action( 'gform_loaded', array( 'GF_to_Andar_Account_Field_Bootstrap', 'load' ), 5 );
