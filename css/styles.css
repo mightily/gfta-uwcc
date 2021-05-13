@@ -1,0 +1,28 @@
+/* Hide phone number fields */
+.ginput_container_andaraccount.no_area_code .andar_area_code {
+    display: none;
+}
+.ginput_container_andaraccount.no_phone_number .andar_phone_number {
+    display: none;
+}
+.ginput_container_andaraccount.no_phone_type .andar_phone_type {
+    display: none;
+}
+/* Condense to one line */
+.condense-emailtype-fname-lname .andar_email_type {
+    display: block;
+    float: left;
+    margin-right: 5%;
+    width: 30%;
+}
+.condense-emailtype-fname-lname .andar_first_name {
+    display: block;
+    float: left;
+    margin-right: 5%;
+    width: 30%;
+}
+.condense-emailtype-fname-lname .andar_last_name {
+    display: block;
+    float: left;
+    width: 30%;
+}
