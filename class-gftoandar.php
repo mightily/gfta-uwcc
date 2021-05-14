@@ -528,7 +528,21 @@ class GFtoAndar extends GFAddOn {
 					),
 				),
 			)
-		);				
+		);
+		array_push($setting_fields,
+			array(
+				'label'   => esc_html__('Process Imported Data?', 'gftoandar' ),
+				'type'    => 'checkbox',
+				'name'    => 'process_import',
+				'tooltip' => esc_html__('Enabling this setting will force Andar to process the imported data instead of importing and waiting for manual processing.' , 'gftoandar' ),
+				'choices' => array(
+					array(
+						'label' => esc_html__( 'Enable automatic processing of imported data', 'gftoandar' ),
+						'name'  => 'process_import',
+					),
+				),
+			)
+		);						
 		array_push($setting_fields,
 			array(
 				'label' => '',
@@ -1191,7 +1205,11 @@ class GFtoAndar extends GFAddOn {
 			}
 
 			// Add param that prevents the transaction from being processed automatically. This will force the api to import the data and not process the data.
-			array_push($this->andar_parameters, '*#CieParm#,command,process,0');
+			if(isset($settings['process_import']) && $settings['process_import'] == 1){
+				array_push($this->andar_parameters, '*#CieParm#,command,process,1');
+			} else {
+				array_push($this->andar_parameters, '*#CieParm#,command,process,0');
+			}
 
 			// Make the request to Andar
 			$this->make_andar_request();
@@ -1529,11 +1547,10 @@ class GFtoAndar extends GFAddOn {
 				$andar_field_header = 'andar_choice_'.$field->id;
 			}
 			$andar_header_value = $settings[$andar_field_header];
-			if($field->type == 'date'){
-				// Remove hypens if it is a date field
-				$andar_data_value = str_replace('-', '', rgar($entry, $field->id));
-				// Remove slashes if it is a date field
-				$andar_data_value = str_replace('/', '', rgar($entry, $field->id));				
+			
+			if($field['type'] == 'date'){
+				// Remove hypens and slashes if it is a date field
+				$andar_data_value = str_replace(array('-', '/'), '', rgar($entry, $field->id));
 			} else {
 				$andar_data_value = rgar($entry, $field->id);
 			}
@@ -1566,12 +1583,20 @@ class GFtoAndar extends GFAddOn {
 	public function build_cybersource_data($form, $entry, $field){
 
 		$settings = $this->get_form_settings($form);
+
 		if($this->payment_total_use_org_headers){
 			// PAYMENT TYPE
 			$this->andar_data_new['Organizations.Transactions.PAYMENTTYPE'] = $this->payment_type;
 			// PAYMENT TOTALS
 			$this->andar_data_new['Organizations.Transactions.TOTALPAYMENTAMOUNT'] = $this->payment_total;
 			$this->andar_data_new['Organizations.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
+
+			// Store some of the cybersource response data
+			$this->andar_data_new['Organizations.Transactions.cybsdecision'] = $this->cybersource_response->decision;
+			$this->andar_data_new['Organizations.Transcations.cybsreasoncode'] = $this->cybersource_response->reasonCode;
+			$this->andar_data_new['Organizations.Transactions.requestid'] = $this->cybersource_response->requestID;
+			$this->andar_data_new['Organizations.Transactions.authorizationnumber'] = $this->cybersource_response->ccAuthReply->authorizationCode;
+			$this->andar_data_new['Organizations.Transactions.approvedate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
 
 			if(isset($settings['book_number']) && $settings['book_number'] != ''){
 				$this->andar_data_new['Organizations.Transactions.DCDetails.TOTALDONATION'] = $this->payment_total;
@@ -1586,12 +1611,19 @@ class GFtoAndar extends GFAddOn {
 			$this->andar_data_new['Individuals.Transactions.TOTALPAYMENTAMOUNT'] = $this->payment_total;
 			$this->andar_data_new['Individuals.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
 
+			// Store some of the cybersource response data
+			$this->andar_data_new['Individuals.Transactions.cybsdecision'] = $this->cybersource_response->decision;
+			$this->andar_data_new['Individuals.Transcations.cybsreasoncode'] = $this->cybersource_response->reasonCode;
+			$this->andar_data_new['Individuals.Transactions.requestid'] = $this->cybersource_response->requestID;
+			$this->andar_data_new['Individuals.Transactions.authorizationnumber'] = $this->cybersource_response->ccAuthReply->authorizationCode;
+			$this->andar_data_new['Individuals.Transactions.approvedate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
+
 			if(isset($settings['book_number']) && $settings['book_number'] != ''){
 				$this->andar_data_new['Individuals.Transactions.DCDetails.TOTALDONATION'] = $this->payment_total;
 			}
 			if(isset($settings['source_code']) && $settings['source_code'] != ''){
 				$this->andar_data_new['Individuals.Transactions.SOURCECODE'] = $settings['source_code'];
-			}			
+			}		
 		}
 		//$this->andar_data_new['Individuals.Transactions.TRANSACTIONTYPE'] = '500Individual';
 		//$this->andar_data_new['EnvelopeMaster.ENVELOPETYPE'] = 'MISC';
