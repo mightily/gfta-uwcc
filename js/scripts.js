@@ -229,11 +229,14 @@ jQuery(function($) {
 		init_all();
 	});
 	
-	if($('div.validation_error').length > 0){
-		$('div.validation_error').parents('.tab').each(function(){
+	if($('div.gform_validation_errors').length > 0){
+		$('div.gform_validation_errors').parents('.tab').each(function(){
+			var thisTab = $(this);
 			setTimeout(function(){
+				thisTab.show();
+				$('[data-tab-trigger="#'+thisTab.attr('id')+'"]').addClass('active');
 				//console.log($('[data-tab-trigger=#'+thisTab.attr('id')+']').offset().top);
-				window.scrollTo(0, $('div.validation_error').offset().top - 150);
+				window.scrollTo(0, $('div.gform_validation_errors').offset().top - 165);
 			}, 1000);
 		});
 	}	
