@@ -927,6 +927,12 @@ class GFtoAndar extends GFAddOn {
 
 				// Before using this example, replace the generic value with your own.
 				$request->merchantReferenceCode = "Website Transaction";
+				$merchantDefinedData = new stdClass();
+				$mddField10 = new stdClass();
+				$mddField10->id = "10";
+				$mddField10->_ = "Website Transaction";
+				$merchantDefinedData->mddField = array($mddField10);
+				$request->merchantDefinedData = $merchantDefinedData;			
 
 				// To help us troubleshoot any problems that you may encounter,
 				// please include the following information about your PHP application.

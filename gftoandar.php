@@ -3,7 +3,7 @@
 Plugin Name: Gravity Forms to Andar
 Plugin URI: https://mightily.com
 Description: Connects Gravity Forms to Andar CRM
-Version: 1.4
+Version: 1.5
 Author: Mightily
 Author URI: https://mightily.com
 
