@@ -821,8 +821,9 @@ class GFtoAndar extends GFAddOn {
                 //     }
                 // }
                 if($field['type'] == 'total' && !(RGFormsModel::is_field_hidden( $form, $field, array()))){
-					
-                    $this->payment_total = rgpost("input_{$field['id']}");
+					// Remove $ character from total
+                    $this->payment_total = str_replace('$', '', rgpost("input_{$field['id']}"));
+
                 }
                 // Check that we have a credit card field
                 if($field['type'] == 'creditcard'){
@@ -1149,6 +1150,7 @@ class GFtoAndar extends GFAddOn {
 				// If there is a total field, go ahead and set it to the totalpledge header. We do this already when processing cybersource, but we will do it again in case cybersource is not being used
                 if($field['type'] == 'total' && !(RGFormsModel::is_field_hidden( $form, $field, array()))){
 					$this->payment_total = rgar($entry, $field->id);
+
 					// Set the $payment_total_use_org_headers property based on the setting in the current total field
 					//var_dump($field->useOrgHeaders);
 					//die();
