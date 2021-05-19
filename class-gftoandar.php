@@ -1601,7 +1601,7 @@ class GFtoAndar extends GFAddOn {
 
 			// Store some of the cybersource response data
 			$this->andar_data_new['Organizations.Transactions.cybsdecision'] = $this->cybersource_response->decision;
-			$this->andar_data_new['Organizations.Transcations.cybsreasoncode'] = $this->cybersource_response->reasonCode;
+			$this->andar_data_new['Organizations.Transactions.cybsreasoncode'] = $this->cybersource_response->reasonCode;
 			$this->andar_data_new['Organizations.Transactions.requestid'] = $this->cybersource_response->requestID;
 			$this->andar_data_new['Organizations.Transactions.authorizationnumber'] = $this->cybersource_response->ccAuthReply->authorizationCode;
 			$this->andar_data_new['Organizations.Transactions.approvedate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
@@ -1621,7 +1621,7 @@ class GFtoAndar extends GFAddOn {
 
 			// Store some of the cybersource response data
 			$this->andar_data_new['Individuals.Transactions.cybsdecision'] = $this->cybersource_response->decision;
-			$this->andar_data_new['Individuals.Transcations.cybsreasoncode'] = $this->cybersource_response->reasonCode;
+			$this->andar_data_new['Individuals.Transactions.cybsreasoncode'] = $this->cybersource_response->reasonCode;
 			$this->andar_data_new['Individuals.Transactions.requestid'] = $this->cybersource_response->requestID;
 			$this->andar_data_new['Individuals.Transactions.authorizationnumber'] = $this->cybersource_response->ccAuthReply->authorizationCode;
 			$this->andar_data_new['Individuals.Transactions.approvedate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
