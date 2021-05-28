@@ -1602,9 +1602,9 @@ class GFtoAndar extends GFAddOn {
 			// Store some of the cybersource response data
 			$this->andar_data_new['Organizations.Transactions.cybsdecision'] = $this->cybersource_response->decision;
 			$this->andar_data_new['Organizations.Transactions.cybsreasoncode'] = $this->cybersource_response->reasonCode;
-			//$this->andar_data_new['Organizations.Transactions.requestid'] = $this->cybersource_response->requestID;
+			$this->andar_data_new['Organizations.Transactions.cybsrequestid'] = $this->cybersource_response->requestID;
 			$this->andar_data_new['Organizations.Transactions.authorizationnumber'] = $this->cybersource_response->ccAuthReply->authorizationCode;
-			//$this->andar_data_new['Organizations.Transactions.approvedate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
+			$this->andar_data_new['Organizations.Transactions.approveddate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
 
 			if(isset($settings['book_number']) && $settings['book_number'] != ''){
 				$this->andar_data_new['Organizations.Transactions.DCDetails.TOTALDONATION'] = $this->payment_total;
@@ -1622,9 +1622,9 @@ class GFtoAndar extends GFAddOn {
 			// Store some of the cybersource response data
 			$this->andar_data_new['Individuals.Transactions.cybsdecision'] = $this->cybersource_response->decision;
 			$this->andar_data_new['Individuals.Transactions.cybsreasoncode'] = $this->cybersource_response->reasonCode;
-			//$this->andar_data_new['Individuals.Transactions.requestid'] = $this->cybersource_response->requestID;
+			$this->andar_data_new['Individuals.Transactions.cybsrequestid'] = $this->cybersource_response->requestID;
 			$this->andar_data_new['Individuals.Transactions.authorizationnumber'] = $this->cybersource_response->ccAuthReply->authorizationCode;
-			//$this->andar_data_new['Individuals.Transactions.approvedate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
+			$this->andar_data_new['Individuals.Transactions.approveddate'] = $this->cybersource_response->ccAuthReply->authorizedDateTime;
 
 			if(isset($settings['book_number']) && $settings['book_number'] != ''){
 				$this->andar_data_new['Individuals.Transactions.DCDetails.TOTALDONATION'] = $this->payment_total;
