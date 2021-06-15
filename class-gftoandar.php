@@ -797,29 +797,29 @@ class GFtoAndar extends GFAddOn {
                     $this->payment_frequency = rgpost("input_{$field['id']}");
 				}
 				// Set payment start date based on field value. Removing because we will just use todays date.
-                // if(
-                //     $field['label'] == 'Payment Start Date' ||
-                //     $field['label'] == 'Payment Start Day' ||
-                //     $field['label'] == 'Billing Start Date' ||
-				// 	$field['label'] == 'Billing Start Day' ||
-                //     $field['label'] == 'Donation Start Date' ||
-				// 	$field['label'] == 'Donation Start Day'
-                // ){
-                //     $is_start_date_hidden = RGFormsModel::is_field_hidden( $form, $field, array());
-                //     if(!$is_start_date_hidden){
-                //         $payment_start_date_value = rgpost("input_{$field['id']}");
-                //         if(is_array($payment_start_date_value)){
-                //             // Create string from MM-DD-YYYY format. New string is YYYYMMDD
-                //             $payment_start_date_string = $payment_start_date_value[2].$payment_start_date_value[0].$payment_start_date_value[1];
-                //             $this->payment_start_date = $payment_start_date_string;
-                //         } else {
-                //             // Explode string by "/"
-                //             $payment_start_date_parts = explode('/', $payment_start_date_value);
-                //             $payment_start_date_string = $payment_start_date_parts[2].$payment_start_date_parts[0].$payment_start_date_parts[1];
-                //             $this->payment_start_date = $payment_start_date_string;
-                //         }
-                //     }
-                // }
+                if(
+                    $field['label'] == 'Payment Start Date' ||
+                    $field['label'] == 'Payment Start Day' ||
+                    $field['label'] == 'Billing Start Date' ||
+					$field['label'] == 'Billing Start Day' ||
+                    $field['label'] == 'Donation Start Date' ||
+					$field['label'] == 'Donation Start Day'
+                ){
+                    $is_start_date_hidden = RGFormsModel::is_field_hidden( $form, $field, array());
+                    if(!$is_start_date_hidden){
+                        $payment_start_date_value = rgpost("input_{$field['id']}");
+                        if(is_array($payment_start_date_value)){
+                            // Create string from MM-DD-YYYY format. New string is YYYYMMDD
+                            $payment_start_date_string = $payment_start_date_value[2].$payment_start_date_value[0].$payment_start_date_value[1];
+                            $this->payment_start_date = $payment_start_date_string;
+                        } else {
+                            // Explode string by "/"
+                            $payment_start_date_parts = explode('/', $payment_start_date_value);
+                            $payment_start_date_string = $payment_start_date_parts[2].$payment_start_date_parts[0].$payment_start_date_parts[1];
+                            $this->payment_start_date = $payment_start_date_string;
+                        }
+                    }
+                }
                 if($field['type'] == 'total' && !(RGFormsModel::is_field_hidden( $form, $field, array()))){
 					// Remove $ character from total
                     $this->payment_total = str_replace('$', '', rgpost("input_{$field['id']}"));
@@ -998,8 +998,9 @@ class GFtoAndar extends GFAddOn {
 					// Set up subscription, not used for single payment
 					$recurringSubscriptionInfo = new stdClass();
 					$recurringSubscriptionInfo->amount = $this->payment_total;
-					$recurringSubscriptionInfo->frequency = "monthly";
-					$recurringSubscriptionInfo->startDate = date('Ymd');
+					//$recurringSubscriptionInfo->frequency = "monthly";
+					$recurringSubscriptionInfo->frequency = "on-demand";
+					$recurringSubscriptionInfo->startDate = $this->payment_start_date;
 					$request->recurringSubscriptionInfo = $recurringSubscriptionInfo;
 					$paySubscriptionCreateService = new stdClass();
 					$paySubscriptionCreateService->run = "true";
@@ -1011,8 +1012,9 @@ class GFtoAndar extends GFAddOn {
 					// Set up subscription, not used for single payment
 					$recurringSubscriptionInfo = new stdClass();
 					$recurringSubscriptionInfo->amount = $this->payment_total;
-					$recurringSubscriptionInfo->frequency = "quarterly";
-					$recurringSubscriptionInfo->startDate = date('Ymd');
+					//$recurringSubscriptionInfo->frequency = "quarterly";
+					$recurringSubscriptionInfo->frequency = "on-demand";
+					$recurringSubscriptionInfo->startDate = $this->payment_start_date;
 					$request->recurringSubscriptionInfo = $recurringSubscriptionInfo;
 					$paySubscriptionCreateService = new stdClass();
 					$paySubscriptionCreateService->run = "true";
@@ -1038,6 +1040,42 @@ class GFtoAndar extends GFAddOn {
                 if($reply->decision == 'ACCEPT'){
                      // If successful, store response for later use
                     $this->cybersource_response = $reply;
+
+					// If this is a subscription and billing start date is today, we need to request the first payment
+					// Step 1 Set the ccAuthService_run service field to true.
+					// Step 2 Set the ccCaptureService_run service field to true.
+					// Step 3 Include the following fields in the request:
+					//  merchantID
+					//  merchantReferenceCode
+					//  purchaseTotals_currency
+					//  purchaseTotals_grandTotalAmount
+					//  recurringSubscriptionInfo_subscriptionID
+
+					if((date('Ymd') == $this->payment_start_date) && ($this->payment_frequency == 'M' || $this->payment_frequency == 'Q') && $this->cybersource_response->paySubscriptionCreateReply->subscriptionID){
+						$secondrequest = new stdClass();
+						$secondrequest->merchantID = gf_to_andar()->get_plugin_setting('cybersourceMerchantId');
+						$secondrequest->merchantReferenceCode = "Website Transaction";
+						$secondrequest->clientLibrary = "PHP";
+						$secondrequest->clientLibraryVersion = phpversion();
+						$secondrequest->clientEnvironment = php_uname();
+						$ccAuthService = new stdClass();
+						$ccAuthService->run = "true";
+						$secondrequest->ccAuthService = $ccAuthService;
+						$ccCaptureService = new stdClass();
+						$ccCaptureService->run = "true";
+						$secondrequest->ccCaptureService = $ccCaptureService;						
+						$purchaseTotals = new stdClass();
+						$purchaseTotals->currency = "USD";
+						$purchaseTotals->grandTotalAmount = $this->payment_total;
+						$secondrequest->purchaseTotals = $purchaseTotals;
+						$recurringSubscriptionInfo = new stdClass();
+						$recurringSubscriptionInfo->subscriptionID = $this->cybersource_response->paySubscriptionCreateReply->subscriptionID;
+						$secondrequest->recurringSubscriptionInfo = $recurringSubscriptionInfo;
+						$secondreply = $soapClient->runTransaction($secondrequest);
+						GFCommon::log_debug( 'Cybersource: second request => ' . print_r( $secondrequest, true ) );
+						GFCommon::log_debug( 'Cybersource: second response => ' . print_r( $secondreply, true ) );						
+					}										
+					
 
                 } else {
  					// Set the validation to false if card was rejected
@@ -1612,6 +1650,17 @@ class GFtoAndar extends GFAddOn {
 			if(isset($settings['source_code']) && $settings['source_code'] != ''){
 				$this->andar_data_new['Organizations.Transactions.SOURCECODE'] = $settings['source_code'];
 			}
+			if($this->payment_start_date){
+				$this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE'] = $this->payment_start_date;
+			}
+			if($this->payment_frequency){
+				$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
+			}			
+			// Add subscription info
+			if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
+				$this->andar_data_new['Organizations.Transactions.BillingSched.CYBSSUBSCRIPTIONID'] = $this->cybersource_response->paySubscriptionCreateReply->subscriptionID;
+				$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSTARTDATE'] = $this->payment_start_date;
+			}			
 		} else {
 			// PAYMENT TYPE
 			$this->andar_data_new['Individuals.Transactions.PAYMENTTYPE'] = $this->payment_type;
@@ -1631,19 +1680,25 @@ class GFtoAndar extends GFAddOn {
 			}
 			if(isset($settings['source_code']) && $settings['source_code'] != ''){
 				$this->andar_data_new['Individuals.Transactions.SOURCECODE'] = $settings['source_code'];
-			}		
+			}
+			if($this->payment_start_date){
+				$this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE'] = $this->payment_start_date;
+			}
+			if($this->payment_frequency){
+				$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
+			}						
+			// Add subscription info
+			if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
+				$this->andar_data_new['Individuals.Transactions.BillingSched.CYBSSUBSCRIPTIONID'] = $this->cybersource_response->paySubscriptionCreateReply->subscriptionID;
+				$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSTARTDATE'] = $this->payment_start_date;
+			}					
 		}
 		//$this->andar_data_new['Individuals.Transactions.TRANSACTIONTYPE'] = '500Individual';
 		//$this->andar_data_new['EnvelopeMaster.ENVELOPETYPE'] = 'MISC';
 		array_push($this->andar_parameters, '*#CieParm#,main,CHECKFORDUPPLED,0');	
-		// SUBSCRIPTION ID
+
 		// print_r($this->cybersource_response);
-//		if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
-//			array_push($this->andar_headers, 'Individuals.Transactions.BillingSched.CYBSSUBSCRIPTIONID');
-//			array_push($this->andar_data, $this->cybersource_response->paySubscriptionCreateReply->subscriptionID);
-//			array_push($this->andar_headers, 'Individuals.Transactions.BillingSched.BILLINGSTARTDATE');
-//			array_push($this->andar_data, $this->payment_start_date);
-//		}
+
 	}
 
 	public function make_andar_request(){
