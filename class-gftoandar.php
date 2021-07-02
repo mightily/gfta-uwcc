@@ -1657,7 +1657,8 @@ class GFtoAndar extends GFAddOn {
 			if($this->payment_frequency){
 				// If payment frequency is one time (Y) and billing start date is todays date, change billingschedule to *None
 				if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
-					$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
+					//$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
+					$this->andar_data_new['Organizations.Transactions.BILLINGSCHEDULECODE'] = '*None';
 				} else {
 					$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
 				}
@@ -1694,7 +1695,8 @@ class GFtoAndar extends GFAddOn {
 			if($this->payment_frequency){
 				// If payment frequency is one time (Y) and billing start date is todays date, change billingschedule to *None
 				if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
-					$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
+					//$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
+					$this->andar_data_new['Individuals.Transactions.BILLINGSCHEDULECODE'] = '*None';
 				} else {
 					$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
 				}
