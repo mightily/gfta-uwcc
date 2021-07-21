@@ -1659,6 +1659,10 @@ class GFtoAndar extends GFAddOn {
 				if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
 					//$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
 					$this->andar_data_new['Organizations.Transactions.BILLINGSCHEDULECODE'] = '*None';
+					// Remove the billing start date header.
+					if(isset($this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE'])){
+						unset($this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE']);
+					}					
 				} else {
 					$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
 				}
@@ -1697,6 +1701,10 @@ class GFtoAndar extends GFAddOn {
 				if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
 					//$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
 					$this->andar_data_new['Individuals.Transactions.BILLINGSCHEDULECODE'] = '*None';
+					// Remove the billing start date header.
+					if(isset($this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE'])){
+						unset($this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE']);
+					}
 				} else {
 					$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
 				}
