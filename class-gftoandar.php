@@ -1189,14 +1189,21 @@ class GFtoAndar extends GFAddOn {
                 if($field['type'] == 'total' && !(RGFormsModel::is_field_hidden( $form, $field, array()))){
 					$this->payment_total = rgar($entry, $field->id);
 
-					// Set the $payment_total_use_org_headers property based on the setting in the current total field
-					//var_dump($field->useOrgHeaders);
-					//die();
+					// Calculate total pledge amount based on frequency
+					$total_pledge_amount = $this->payment_total;
+					if($this->payment_frequency == 'M'){
+						$total_pledge_amount = $this->payment_total*12;
+					}
+					if($this->payment_frequency == 'Q'){
+						$total_pledge_amount = $this->payment_total*4;
+					}
+
+					// Set the total pledge amount
 					if($field->useOrgHeaders){
 						$this->payment_total_use_org_headers = true;
-						$this->andar_data_new['Organizations.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
+						$this->andar_data_new['Organizations.Transactions.TOTALPLEDGEAMOUNT'] = $total_pledge_amount;
 					} else {
-						$this->andar_data_new['Individuals.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
+						$this->andar_data_new['Individuals.Transactions.TOTALPLEDGEAMOUNT'] = $total_pledge_amount;
 					}
 					// $this->andar_data_new['Individuals.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
                 }
@@ -1630,12 +1637,27 @@ class GFtoAndar extends GFAddOn {
 
 		$settings = $this->get_form_settings($form);
 
+		// Calculat total pledge amount based on payment frequency
+		$total_pledge_amount = $this->payment_total;
+		if($this->payment_frequency == 'M'){
+			$total_pledge_amount = $this->payment_total*12;
+		}
+		if($this->payment_frequency == 'Q'){
+			$total_pledge_amount = $this->payment_total*4;
+		}
+
+		// Calculate total payment amount
+		$total_payment_amount = 0;
+		if(date('Ymd') == $this->payment_start_date) {
+			$total_payment_amount = $this->payment_total;
+		}
+
 		if($this->payment_total_use_org_headers){
 			// PAYMENT TYPE
 			$this->andar_data_new['Organizations.Transactions.PAYMENTTYPE'] = $this->payment_type;
 			// PAYMENT TOTALS
-			$this->andar_data_new['Organizations.Transactions.TOTALPAYMENTAMOUNT'] = $this->payment_total;
-			$this->andar_data_new['Organizations.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
+			$this->andar_data_new['Organizations.Transactions.TOTALPLEDGEAMOUNT'] = $total_pledge_amount;
+			$this->andar_data_new['Organizations.Transactions.TOTALPAYMENTAMOUNT'] = $total_payment_amount;
 
 			// Store some of the cybersource response data
 			$this->andar_data_new['Organizations.Transactions.cybsdecision'] = $this->cybersource_response->decision;
@@ -1654,18 +1676,16 @@ class GFtoAndar extends GFAddOn {
 			if($this->payment_start_date){
 				$this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE'] = $this->payment_start_date;
 			}
-			if($this->payment_frequency){
-				// If payment frequency is one time (Y) and billing start date is todays date, change billingschedule to *None
-				if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
-					//$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
-					$this->andar_data_new['Organizations.Transactions.BILLINGSCHEDULECODE'] = '*None';
-					// Remove the billing start date header.
-					if(isset($this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE'])){
-						unset($this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE']);
-					}					
-				} else {
-					$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
-				}
+			// If payment frequency is one time (Y) and billing start date is todays date, change billingschedule to *None
+			if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
+				//$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
+				$this->andar_data_new['Organizations.Transactions.BILLINGSCHEDULECODE'] = '*None';
+				// Remove the billing start date header.
+				if(isset($this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE'])){
+					unset($this->andar_data_new['Organizations.Transactions.BILLINGSTARTDATE']);
+				}					
+			} else {
+				$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
 			}			
 			// Add subscription info
 			if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
@@ -1676,8 +1696,8 @@ class GFtoAndar extends GFAddOn {
 			// PAYMENT TYPE
 			$this->andar_data_new['Individuals.Transactions.PAYMENTTYPE'] = $this->payment_type;
 			// PAYMENT TOTALS
-			$this->andar_data_new['Individuals.Transactions.TOTALPAYMENTAMOUNT'] = $this->payment_total;
-			$this->andar_data_new['Individuals.Transactions.TOTALPLEDGEAMOUNT'] = $this->payment_total;
+			$this->andar_data_new['Individuals.Transactions.TOTALPLEDGEAMOUNT'] = $total_pledge_amount;
+			$this->andar_data_new['Individuals.Transactions.TOTALPAYMENTAMOUNT'] = $total_payment_amount;
 
 			// Store some of the cybersource response data
 			$this->andar_data_new['Individuals.Transactions.cybsdecision'] = $this->cybersource_response->decision;
@@ -1696,18 +1716,16 @@ class GFtoAndar extends GFAddOn {
 			if($this->payment_start_date){
 				$this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE'] = $this->payment_start_date;
 			}
-			if($this->payment_frequency){
-				// If payment frequency is one time (Y) and billing start date is todays date, change billingschedule to *None
-				if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
-					//$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
-					$this->andar_data_new['Individuals.Transactions.BILLINGSCHEDULECODE'] = '*None';
-					// Remove the billing start date header.
-					if(isset($this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE'])){
-						unset($this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE']);
-					}
-				} else {
-					$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
+			// If payment frequency is one time (Y) and billing start date is todays date, change billingschedule to *None
+			if(date('Ymd') == $this->payment_start_date && $this->payment_frequency == 'Y'){
+				//$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = '*None';
+				$this->andar_data_new['Individuals.Transactions.BILLINGSCHEDULECODE'] = '*None';
+				// Remove the billing start date header.
+				if(isset($this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE'])){
+					unset($this->andar_data_new['Individuals.Transactions.BILLINGSTARTDATE']);
 				}
+			} else {
+				$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSCHEDULECODE'] = $this->payment_frequency;
 			}						
 			// Add subscription info
 			if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
