@@ -1647,8 +1647,12 @@ class GFtoAndar extends GFAddOn {
 		}
 
 		// Calculate total payment amount
-		$total_payment_amount = 0;
-		if(date('Ymd') == $this->payment_start_date) {
+		if($this->payment_start_date){
+			$total_payment_amount = 0;
+			if(date('Ymd') == $this->payment_start_date) {
+				$total_payment_amount = $this->payment_total;
+			}			
+		} else {
 			$total_payment_amount = $this->payment_total;
 		}
 
