@@ -25,6 +25,7 @@ class GFtoAndar extends GFAddOn {
 
     protected $form_instance = null;
     protected $cybersource_response = null;
+	protected $payment_card = null;
     protected $payment_type = null;
 	protected $payment_type_code = null;
 	protected $payment_frequency = 'Y';
@@ -984,6 +985,8 @@ class GFtoAndar extends GFAddOn {
 				// $card->expirationYear = "2020";
 				$card->cardType = $this->payment_type_code;
 				$request->card = $card;
+				// We need this later
+				$this->payment_card = $card;
 
 				$purchaseTotals = new stdClass();
 				$purchaseTotals->currency = "USD";
@@ -1562,7 +1565,9 @@ class GFtoAndar extends GFAddOn {
 			if(strpos($field->cssClass, 'anonymous-flag') !== false){
 				// If there is a checkbox value set, we need to override the value to 'uncheck'
 				if(count($checkbox_values) > 0){
-					$checkbox_values = ['0'];
+					$checkbox_values = ['uncheck'];
+				} else {
+					$checkbox_values = ['check'];
 				}
 			}			
 			$this->andar_data_new[$settings[$andar_field_header]] = implode(', ', $checkbox_values);			
@@ -1618,8 +1623,15 @@ class GFtoAndar extends GFAddOn {
 				if(isset($this->andar_data_new['Organizations.ACCOUNTNUMBER'])){
 					unset($this->andar_data_new['Organizations.ACCOUNTNUMBER']);
 				}
-			}						
+			}
 			$this->andar_data_new[$andar_header_value] = $andar_data_value;
+			// Unset the releaseflag field if it is being used and it is an empty string.
+			// if(isset($this->andar_data_new['Individuals.Transactions.RELEASEFLAG']) && $this->andar_data_new['Individuals.Transactions.RELEASEFLAG'] == ''){
+			// 	unset($this->andar_data_new['Individuals.Transactions.RELEASEFLAG']);
+			// }
+			// if(isset($this->andar_data_new['Organizations.Transactions.RELEASEFLAG']) && $this->andar_data_new['Organizations.Transactions.RELEASEFLAG'] == ''){
+			// 	unset($this->andar_data_new['Organizations.Transactions.RELEASEFLAG']);
+			// }		
 		}
 	}
 
@@ -1695,6 +1707,19 @@ class GFtoAndar extends GFAddOn {
 			if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
 				$this->andar_data_new['Organizations.Transactions.BillingSched.CYBSSUBSCRIPTIONID'] = $this->cybersource_response->paySubscriptionCreateReply->subscriptionID;
 				$this->andar_data_new['Organizations.Transactions.BillingSched.BILLINGSTARTDATE'] = $this->payment_start_date;
+				// New fields added 11/19/21
+				if(isset($this->andar_data_new['Organizations.Transactions.CampaignYear'])){
+					$this->andar_data_new['Organizations.Transactions.BillingSched.CampaignYear'] = $this->andar_data_new['Organizations.Transactions.CampaignYear'];
+				}
+				if(isset($this->andar_data_new['Organizations.Transactions.TRANSACTIONTYPE'])){
+					$this->andar_data_new['Organizations.Transactions.BillingSched.TransactionType'] = $this->andar_data_new['Organizations.Transactions.TRANSACTIONTYPE'];
+				}
+				if(isset($this->andar_data_new['Organizations.Transactions.PAYMENTTYPE'])){
+					$this->andar_data_new['Organizations.Transactions.BillingSched.PaymentType'] = $this->andar_data_new['Organizations.Transactions.PAYMENTTYPE'];
+				}
+				if(isset($this->payment_card)){
+					$this->andar_data_new['Organizations.Transactions.BillingSched.CardExpiryDate'] = str_pad($this->payment_card->expirationMonth, 2, '0', STR_PAD_LEFT) . '/' . $this->payment_card->expirationYear;
+				}				
 			}			
 		} else {
 			// PAYMENT TYPE
@@ -1735,6 +1760,19 @@ class GFtoAndar extends GFAddOn {
 			if(isset($this->cybersource_response->paySubscriptionCreateReply->subscriptionID)){
 				$this->andar_data_new['Individuals.Transactions.BillingSched.CYBSSUBSCRIPTIONID'] = $this->cybersource_response->paySubscriptionCreateReply->subscriptionID;
 				$this->andar_data_new['Individuals.Transactions.BillingSched.BILLINGSTARTDATE'] = $this->payment_start_date;
+				// New fields added 11/19/21
+				if(isset($this->andar_data_new['Individuals.Transactions.CampaignYear'])){
+					$this->andar_data_new['Individuals.Transactions.BillingSched.CampaignYear'] = $this->andar_data_new['Individuals.Transactions.CampaignYear'];
+				}
+				if(isset($this->andar_data_new['Individuals.Transactions.TRANSACTIONTYPE'])){
+					$this->andar_data_new['Individuals.Transactions.BillingSched.TransactionType'] = $this->andar_data_new['Individuals.Transactions.TRANSACTIONTYPE'];
+				}
+				if(isset($this->andar_data_new['Individuals.Transactions.PAYMENTTYPE'])){
+					$this->andar_data_new['Individuals.Transactions.BillingSched.PaymentType'] = $this->andar_data_new['Individuals.Transactions.PAYMENTTYPE'];
+				}
+				if(isset($this->payment_card)){
+					$this->andar_data_new['Individuals.Transactions.BillingSched.CardExpiryDate'] = str_pad($this->payment_card->expirationMonth, 2, '0', STR_PAD_LEFT) . '/' . $this->payment_card->expirationYear;
+				}
 			}					
 		}
 		//$this->andar_data_new['Individuals.Transactions.TRANSACTIONTYPE'] = '500Individual';
