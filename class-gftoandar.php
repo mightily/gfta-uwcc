@@ -846,20 +846,6 @@ class GFtoAndar extends GFAddOn {
             }
 
         }
-		// If name is equal to Ricardo Silva, dont process the card
-		if($first_name == 'Ricardo' && $last_name == 'Silva'){
-			//Assign modified $form object back to the validation result
-			$validation_result['is_valid'] = false;
-			$validation_result['form'] = $form;
-			return $validation_result;
-		}
-		// If Ricardo email, dont process the card
-		if($billing_email == 'rbbolado@gmail.com'){
-			//Assign modified $form object back to the validation result
-			$validation_result['is_valid'] = false;
-			$validation_result['form'] = $form;
-			return $validation_result;
-		}
 		// Check if send to cybersource is enabled. If so, continue with call to cybersource
 		// Also need to make sure we are on the last page, and credit card data is entered
 		if($process_card){
@@ -878,6 +864,12 @@ class GFtoAndar extends GFAddOn {
             $card_name_array = explode(" ", $card_name);
             $card_firstname = $card_name_array[0];
             $card_lastname = $card_name_array[1];
+			if($card_firstname == '' || !$card_firstname){
+				$card_firstname = $first_name;
+			}			
+			if($card_lastname == '' || !$card_lastname){
+				$card_lastname = $last_name;
+			}			
             // Set payment type for later use
             $this->payment_type = getCardBrand($card_number);
 			$this->payment_type_code = getCardBrandCode($this->payment_type);
@@ -1447,10 +1439,10 @@ class GFtoAndar extends GFAddOn {
 	}
 	public function build_andar_account_data($form, $entry, $field){
 		// file_put_contents('andar.txt', print_r($field->inputs, true));
-		$andar_first_name_value = sanitize_for_andar(rgar($entry, $field->inputs[0]['id']));
-		$andar_last_name_value = sanitize_for_andar(rgar($entry, $field->inputs[1]['id']));
+		$andar_first_name_value = rgar($entry, $field->inputs[0]['id']);
+		$andar_last_name_value = rgar($entry, $field->inputs[1]['id']);
 
-		$andar_email_address_value = sanitize_for_andar(rgar($entry, $field->inputs[2]['id']));
+		$andar_email_address_value = rgar($entry, $field->inputs[2]['id']);
 		$andar_email_type_value = rgar($entry, $field->inputs[3]['id']);
 
 		$andar_account_number_value = rgar($entry, $field->inputs[4]['id']);
@@ -1512,13 +1504,13 @@ class GFtoAndar extends GFAddOn {
 	}	
 
 	public function build_andar_address_data($form, $entry, $field){
-		$andar_address_street1_value = sanitize_for_andar(rgar($entry, $field->inputs[0]['id']));
-		$andar_address_street2_value = sanitize_for_andar(rgar($entry, $field->inputs[1]['id']));
+		$andar_address_street1_value = rgar($entry, $field->inputs[0]['id']);
+		$andar_address_street2_value = rgar($entry, $field->inputs[1]['id']);
 
-		$andar_address_city_value = sanitize_for_andar(rgar($entry, $field->inputs[2]['id']));
-		$andar_address_state_value = sanitize_for_andar(rgar($entry, $field->inputs[3]['id']));
+		$andar_address_city_value = rgar($entry, $field->inputs[2]['id']);
+		$andar_address_state_value = rgar($entry, $field->inputs[3]['id']);
 
-		$andar_address_postcode_value = sanitize_for_andar(rgar($entry, $field->inputs[4]['id']));
+		$andar_address_postcode_value = rgar($entry, $field->inputs[4]['id']);
 
 		$andar_address_country_value = rgar($entry, $field->inputs[5]['id']);
 		$andar_address_type_value = rgar($entry, $field->inputs[6]['id']);
@@ -1783,11 +1775,21 @@ class GFtoAndar extends GFAddOn {
 
 	}
 
+	public function global_sanitize($data_array){
+		foreach($data_array as $key => $value){
+			$value = trim($value);
+			$value = str_replace(',', '', $value);
+			$data_array[$key] = $value;
+		}
+		return $data_array;
+	}
+
 	public function make_andar_request(){
 		// Convert headers to string
 		$this->andar_headers_string = implode(',', array_keys($this->andar_data_new));
+		// Sanitize the data
 		// Convert data to string
-		$this->andar_data_string = implode(',', $this->andar_data_new);
+		$this->andar_data_string = implode(',', $this->global_sanitize($this->andar_data_new));
 		// Convert parameters to string
 		$this->andar_parameters_string = implode("\n", $this->andar_parameters);
 
