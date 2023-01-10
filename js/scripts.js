@@ -3,12 +3,12 @@ jQuery(function($) {
     console.log('Andar Email Ready');
 
     // Init vars
-	var andar_account_field = $('.ginput_container_andaraccount').parent(),
+	var andar_account_field = jQuery('.ginput_container_andaraccount').parent(),
 		//andar_account_field = [],
         andar_email_previous_field_value = '',
         call_andar = false,
         contact_info = {},
-		all_input_fields = $('.gform_wrapper input');
+		all_input_fields = jQuery('.gform_wrapper input');
 		//console.log(andar_account_field);
 		// andar_account_fields_all.each(function(index){
 		// 	if(this.style.display && this.style.display == 'none'){
@@ -20,12 +20,12 @@ jQuery(function($) {
 		// console.log(andar_account_field);		
 
 	function set_vars(){
-		andar_account_field = $('.ginput_container_andaraccount').parent();
+		andar_account_field = jQuery('.ginput_container_andaraccount').parent();
 		//andar_account_field = [];
         //andar_email_previous_field_value = '';
         call_andar = false;
         contact_info = {};
-		all_input_fields = $('.gform_wrapper input');
+		all_input_fields = jQuery('.gform_wrapper input');
 		// If andar account field is set to display: none, then it should be removed from array
 		// console.log(andar_account_field);
 		// andar_account_fields_all.each(function(index){
@@ -41,7 +41,7 @@ jQuery(function($) {
     // Function defs
 	function get_obj_key_from_value(contact_object, contact_value){
 		var email_type = 'PERSONAL1';
-		$.each(contact_object, function( key, value ) {
+		jQuery.each(contact_object, function( key, value ) {
 			if(value == contact_value){
 				email_type = key;
 				return false;
@@ -65,7 +65,7 @@ jQuery(function($) {
             console.log('Requesting data from Andar');
 			// Fade out form elements while this is processing
 			// blurred_field.parents('form').find('input, select').not(blurred_field).fadeTo("fast", 0.25);
-            $.ajax({
+            jQuery.ajax({
                 url: gftoandarurls.siteurl + '/wp-json/gftoandar/v1/account?andaremail='+email_value,
                 success: function(result){
 					console.log('Received data from Andar');
@@ -78,47 +78,47 @@ jQuery(function($) {
 					}
 
 					// Update the account number value in the Andar account field
-					$('#' + andar_account_field_id + '_5').val(contact_info.INDNUM);
+					jQuery('#' + andar_account_field_id + '_5').val(contact_info.INDNUM);
 
 					// Update the first name value in the Andar account field
-					// $('#' + andar_account_field_id + '_1').val(contact_info.FIRSTNAME);
+					// jQuery('#' + andar_account_field_id + '_1').val(contact_info.FIRSTNAME);
 
 					// Update the last name value in the Andar account field
-					// $('#' + andar_account_field_id + '_2').val(contact_info.LASTNAME);
+					// jQuery('#' + andar_account_field_id + '_2').val(contact_info.LASTNAME);
 
 					// Update the email type value in the Andar account field
-					 $('#' + andar_account_field_id + '_4').val(get_obj_key_from_value(contact_info, email_value));
+					 jQuery('#' + andar_account_field_id + '_4').val(get_obj_key_from_value(contact_info, email_value));
 
 					// Update the area code value in the Andar account field
-					// $('#' + andar_account_field_id + '_6').val(contact_info.HOMEAREACODE);
+					// jQuery('#' + andar_account_field_id + '_6').val(contact_info.HOMEAREACODE);
 
 					// Update the phone number value in the Andar account field
-					// $('#' + andar_account_field_id + '_7').val(contact_info.HOMEPHONENUMBER);
+					// jQuery('#' + andar_account_field_id + '_7').val(contact_info.HOMEPHONENUMBER);
 
                     // If there is an andar address field
-//					if($('.autofill-andar-address').length > 0){
-//						var address_id = $('.autofill-andar-address .ginput_container_address').attr('id');
+//					if(jQuery('.autofill-andar-address').length > 0){
+//						var address_id = jQuery('.autofill-andar-address .ginput_container_address').attr('id');
 //						console.log('Autofill address id ' + address_id);
 //						console.log('Repopulating address fields');
-//						$('#' + address_id + '_1').val(contact_info.MAINADDR1);
-//						$('#' + address_id + '_2').val(contact_info.MAINADDR2);
-//						$('#' + address_id + '_3').val(contact_info.MAINCITY);
-//						$('#' + address_id + '_4').val(contact_info.MAINSTATE);
-//						$('#' + address_id + '_5').val(contact_info.MAINZIPPOSTALCODE);
-//						$('#' + address_id + '_6').val(contact_info.MAINCOUNTRY);
+//						jQuery('#' + address_id + '_1').val(contact_info.MAINADDR1);
+//						jQuery('#' + address_id + '_2').val(contact_info.MAINADDR2);
+//						jQuery('#' + address_id + '_3').val(contact_info.MAINCITY);
+//						jQuery('#' + address_id + '_4').val(contact_info.MAINSTATE);
+//						jQuery('#' + address_id + '_5').val(contact_info.MAINZIPPOSTALCODE);
+//						jQuery('#' + address_id + '_6').val(contact_info.MAINCOUNTRY);
 //					}
 
 					// If there is a regular address field
-//					if($('.autofill-address').length > 0){
-//						var address_id = $('.autofill-address .ginput_container_address').attr('id');
+//					if(jQuery('.autofill-address').length > 0){
+//						var address_id = jQuery('.autofill-address .ginput_container_address').attr('id');
 //						console.log('Autofill address id ' + address_id);
 //						console.log('Repopulating address fields');
-//						$('#' + address_id + '_1').val(contact_info.MAINADDR1);
-//						$('#' + address_id + '_2').val(contact_info.MAINADDR2);
-//						$('#' + address_id + '_3').val(contact_info.MAINCITY);
-//						$('#' + address_id + '_4').val(contact_info.MAINSTATE);
-//						$('#' + address_id + '_5').val(contact_info.MAINZIPPOSTALCODE);
-//						$('#' + address_id + '_6').val(contact_info.MAINCOUNTRY);
+//						jQuery('#' + address_id + '_1').val(contact_info.MAINADDR1);
+//						jQuery('#' + address_id + '_2').val(contact_info.MAINADDR2);
+//						jQuery('#' + address_id + '_3').val(contact_info.MAINCITY);
+//						jQuery('#' + address_id + '_4').val(contact_info.MAINSTATE);
+//						jQuery('#' + address_id + '_5').val(contact_info.MAINZIPPOSTALCODE);
+//						jQuery('#' + address_id + '_6').val(contact_info.MAINCOUNTRY);
 //					}
 
 					// Fade in form elements
@@ -131,31 +131,31 @@ jQuery(function($) {
 	function add_event_handlers(){
 		andar_account_field.each(function(){
 			if(this.style.display != 'none'){
-				var notification_email_field = $(this).parents('.gform_wrapper').find('.autofill-notification-email-address input');
-				var notification_fname_field = $(this).parents('.gform_wrapper').find('.autofill-notification-first-name input');
-				var notification_lname_field = $(this).parents('.gform_wrapper').find('.autofill-notification-last-name input');
-				var andar_account_field_id = $(this).attr('id');
+				var notification_email_field = jQuery(this).parents('.gform_wrapper').find('.autofill-notification-email-address input');
+				var notification_fname_field = jQuery(this).parents('.gform_wrapper').find('.autofill-notification-first-name input');
+				var notification_lname_field = jQuery(this).parents('.gform_wrapper').find('.autofill-notification-last-name input');
+				var andar_account_field_id = jQuery(this).attr('id');
 				var andar_account_field_parts = andar_account_field_id.split('_');
 					andar_account_field_id = 'input_' + andar_account_field_parts[2] + '_' + andar_account_field_parts[1];
 				// Set the blur event handler for email address field
-				$('#' + andar_account_field_id + '_3').off().on('blur', function(evt){
-					var email_value = $(this).val();
+				jQuery('#' + andar_account_field_id + '_3').off().on('blur', function(evt){
+					var email_value = jQuery(this).val();
 					// Only reach out to andar if the email value is different
 					if(email_value != andar_email_previous_field_value && email_value.length > 0 && email_value != ''){
 						andar_email_previous_field_value = email_value;
-						get_contact_info($(this), email_value, andar_account_field_id);	
+						get_contact_info(jQuery(this), email_value, andar_account_field_id);	
 					}
 					// Populate the notification email address hidden field with this email address
 					// notification_email_address_input.val(email_value);
-					// console.log($(this).parents('.gform_wrapper').find('.autofill-notification-email-address input'));
+					// console.log(jQuery(this).parents('.gform_wrapper').find('.autofill-notification-email-address input'));
 					if(notification_email_field.length > 0){
 						notification_email_field.val(email_value);
 						notification_email_field.attr('value', email_value);
 					}
 				});
 				// Set the blur event handler for first name field
-				$('#' + andar_account_field_id + '_1').off().on('blur', function(evt){
-					var fname_value = $(this).val();
+				jQuery('#' + andar_account_field_id + '_1').off().on('blur', function(evt){
+					var fname_value = jQuery(this).val();
 					// Populate the notification first name hidden field with this first name value
 					if(notification_fname_field.length > 0){
 						notification_fname_field.val(fname_value);
@@ -163,8 +163,8 @@ jQuery(function($) {
 					}
 				});
 				// Set the blur event handler for last name field
-				$('#' + andar_account_field_id + '_2').off().on('blur', function(evt){
-					var lname_value = $(this).val();
+				jQuery('#' + andar_account_field_id + '_2').off().on('blur', function(evt){
+					var lname_value = jQuery(this).val();
 					// Populate the notification first name hidden field with this first name value
 					if(notification_lname_field.length > 0){
 						notification_lname_field.val(lname_value);
@@ -178,16 +178,16 @@ jQuery(function($) {
 	function run_on_init(){
 		andar_account_field.each(function(){
 			if(this.style.display != 'none'){
-				var andar_account_field_id = $(this).attr('id');
+				var andar_account_field_id = jQuery(this).attr('id');
 				var andar_account_field_parts = andar_account_field_id.split('_');
 					andar_account_field_id = 'input_' + andar_account_field_parts[2] + '_' + andar_account_field_parts[1],
-					andar_account_email_value = $('#' + andar_account_field_id + '_3').val();
+					andar_account_email_value = jQuery('#' + andar_account_field_id + '_3').val();
 
 				// If this email field has a value
 				if(andar_account_email_value.length > 0 && andar_account_email_value != '' && andar_account_email_value != andar_email_previous_field_value){
 					andar_email_previous_field_value = andar_account_email_value;
 					console.log('getting email again');
-					get_contact_info($('#' + andar_account_field_id + '_3'), $('#' + andar_account_field_id + '_3').val(), andar_account_field_id);
+					get_contact_info(jQuery('#' + andar_account_field_id + '_3'), jQuery('#' + andar_account_field_id + '_3').val(), andar_account_field_id);
 				}
 			}
 		});
@@ -196,11 +196,11 @@ jQuery(function($) {
 	function replace_date_placeholders(){
 
 		all_input_fields.each(function(){
-			if($(this).val() == '{ymd}'){
+			if(jQuery(this).val() == '{ymd}'){
 				var MyDate = new Date();
 				var MyDateString;
 				MyDateString = MyDate.getFullYear() + ('0' + (MyDate.getMonth()+1)).slice(-2) + ('0' + MyDate.getDate()).slice(-2);
-				$(this).val(MyDateString);
+				jQuery(this).val(MyDateString);
 			}
 		});
 
@@ -221,7 +221,7 @@ jQuery(function($) {
 	init_all();
 
 	// Run when page changes in gravity forms
-	$(document).on('gform_page_loaded', function(event, form_id, current_page){
+	jQuery(document).on('gform_page_loaded', function(event, form_id, current_page){
         init_all();
 	});
 	
@@ -229,14 +229,14 @@ jQuery(function($) {
 		init_all();
 	});
 	
-	if($('div.gform_validation_errors').length > 0){
-		$('div.gform_validation_errors').parents('.tab').each(function(){
-			var thisTab = $(this);
+	if(jQuery('div.gform_validation_errors').length > 0){
+		jQuery('div.gform_validation_errors').parents('.tab').each(function(){
+			var thisTab = jQuery(this);
 			setTimeout(function(){
 				thisTab.show();
-				$('[data-tab-trigger="#'+thisTab.attr('id')+'"]').addClass('active');
-				//console.log($('[data-tab-trigger=#'+thisTab.attr('id')+']').offset().top);
-				window.scrollTo(0, $('div.gform_validation_errors').offset().top - 165);
+				jQuery('[data-tab-trigger="#'+thisTab.attr('id')+'"]').addClass('active');
+				//console.log(jQuery('[data-tab-trigger=#'+thisTab.attr('id')+']').offset().top);
+				window.scrollTo(0, jQuery('div.gform_validation_errors').offset().top - 165);
 			}, 1000);
 		});
 	}	
@@ -245,8 +245,8 @@ jQuery(function($) {
 
 // Set min and max dates to the date picker if classes are set
 gform.addFilter( 'gform_datepicker_options_pre_init', function(optionsObj, formId, fieldId){
-	if($('#field_'+formId+'_'+fieldId).length > 0){
-		var currentField = $('#field_' + formId + '_' + fieldId);
+	if(jQuery('#field_'+formId+'_'+fieldId).length > 0){
+		var currentField = jQuery('#field_' + formId + '_' + fieldId);
 		if(currentField.hasClass('date-min-max')){
 			var classes = currentField.attr('class');
 			var minClass = classes.match(/min\-\d+/gi);
