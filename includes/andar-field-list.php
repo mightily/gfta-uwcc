@@ -250,9 +250,25 @@ function andar_field_list(){
 			'value' => 'Individuals.UserDefinedFields.USERDEFINEDFIELD'
 		),
 		array(
+			'label' => esc_html__('Individuals.UserDefinedFields[1].USERDEFINEDFIELD', 'gftoandar'),
+			'value' => 'Individuals.UserDefinedFields[1].USERDEFINEDFIELD'
+		),
+		array(
+			'label' => esc_html__('Individuals.UserDefinedFields[2].USERDEFINEDFIELD', 'gftoandar'),
+			'value' => 'Individuals.UserDefinedFields[2].USERDEFINEDFIELD'
+		),				
+		array(
 			'label' => esc_html__('Individuals.UserDefinedFields.FIELDVALUE', 'gftoandar'),
 			'value' => 'Individuals.UserDefinedFields.FIELDVALUE'
 		),
+		array(
+			'label' => esc_html__('Individuals.UserDefinedFields[1].FIELDVALUE', 'gftoandar'),
+			'value' => 'Individuals.UserDefinedFields[1].FIELDVALUE'
+		),	
+		array(
+			'label' => esc_html__('Individuals.UserDefinedFields[2].FIELDVALUE', 'gftoandar'),
+			'value' => 'Individuals.UserDefinedFields[2].FIELDVALUE'
+		),			
 		array(
 			'label' => esc_html__('Organizations.ACCOUNTNUMBER', 'gftoandar'),
 			'value' => 'Organizations.ACCOUNTNUMBER'
